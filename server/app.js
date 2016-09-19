@@ -43,5 +43,25 @@ app.get("/treats", urlEncodedParser, function(req, res){
   });// end pg connect
 }); // end get treats
 
+// add new treats POST
+app.post('/treats', urlEncodedParser, function(req, res){
+  //create vars from req.body
+  var name= req.body.name;
+  var description = req.body.description;
+  var pic = req.body.url;
+  pg.connect(connectionString, function(err, client, done){
+    if(err){
+      console.log(err);
+    }//end if
+    else{
+      console.log("Connected to the DB");
+      client.query('INSERT INTO treat(name, description, pic) VALUES($1,$2,$3);',[name, description, pic]);
+      var queryResult = client.query('SELECT * FROM treat WHERE name= $1;', [name]);
+      done();
+      res.send(queryResult);
+    }//end else
+  });//end PG connect
+}); //end treats post
+
 //Set public as static
 app.use(express.static('server/public'));
